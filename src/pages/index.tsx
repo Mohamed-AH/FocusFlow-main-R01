@@ -1177,7 +1177,7 @@ export default function FocusFlow() {
               <MonthlyHeatmap
                 dailyRecords={
                   // Map dailyRecords to MonthlyHeatmap's expected shape for current month
-                  Object.values(currentProfile.dailyRecords || {})
+                  (Object.values(currentProfile.dailyRecords || {}) as DailyRecord[])
                     .filter((rec: DailyRecord) => {
                       if (!rec?.date) return false;
                       const date = new Date(rec.date);
