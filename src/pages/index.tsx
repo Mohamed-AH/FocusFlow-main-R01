@@ -11,6 +11,8 @@ interface Activity {
   color: string;
   icon: string;
   category: string;
+  order?: number;
+  isDefault?: boolean;
 }
 
 interface ActivityRecord {
@@ -33,8 +35,23 @@ interface Profile {
   id: string;
   name: string;
   type: ProfileType;
-  activities: Activity[];
+  avatar: string;
+  created: string;
+  activities: Record<string, Activity>;
   dailyRecords: Record<string, DailyRecord>;
+  streaks: {
+    current: number;
+    best: number;
+    perfectDays: number;
+    lastUpdate: string;
+  };
+  achievements: any[];
+  preferences: {
+    completionGoal: number;
+    workingHours: { start: string; end: string };
+    breakReminders: boolean;
+    weeklyGoal: number;
+  };
 }
 
 import { AnimatePresence, motion } from "framer-motion";
@@ -246,13 +263,13 @@ function getCompletionRate(profile: any) {
   return record?.completionRate ?? 0;
 }
 
-function getCurrentStreak(profile: any) {
+function getCurrentStreak(profile: Profile) {
   return profile?.streaks?.current ?? 0;
 }
 
-function getActivitiesForToday(profile: any) {
+function getActivitiesForToday(profile: Profile) {
   if (!profile?.activities) return [];
-  return Object.values(profile.activities).sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+  return Object.values(profile.activities).sort((a: Activity, b: Activity) => (a.order || 0) - (b.order || 0));
 }
 
 // --- Local Storage Logic ---
@@ -261,7 +278,24 @@ const STORAGE_KEY = "focusflow_app_data";
 const STORAGE_VERSION = "1.0";
 const DEBOUNCE_DELAY = 500;
 
-function getInitialData() {
+interface AppData {
+  version: string;
+  profiles: Record<string, Profile>;
+  settings: {
+    currentProfile: string | null;
+    theme: string;
+    notifications: boolean;
+    sound: boolean;
+    language: string;
+  };
+  app: {
+    firstLaunch: string;
+    totalSessions: number;
+    lastBackup: string | null;
+  };
+}
+
+function getInitialData(): AppData {
   return {
     version: STORAGE_VERSION,
     profiles: {},
@@ -280,7 +314,7 @@ function getInitialData() {
   };
 }
 
-function validateProfile(profile: any) {
+function validateProfile(profile: Partial<Profile>) {
   if (!profile) return false;
   if (!profile.id || !profile.name || !profile.type) return false;
   if (typeof profile.name !== "string" || profile.name.length < 1 || profile.name.length > 20) return false;
@@ -598,7 +632,7 @@ export default function FocusFlow() {
       toast({ title: "Invalid profile", description: "Please check your inputs.", variant: "destructive" });
       return;
     }
-    setAppData((prev: any) => {
+    setAppData((prev: AppData) => {
       const updated = {
         ...prev,
         profiles: { ...prev.profiles, [id]: newProfile },
@@ -612,7 +646,7 @@ export default function FocusFlow() {
   }
 
   function handleProfileSwitch(id: string) {
-    setAppData((prev: any) => ({
+    setAppData((prev: AppData) => ({
       ...prev,
       settings: { ...prev.settings, currentProfile: id },
     }));
@@ -826,7 +860,7 @@ export default function FocusFlow() {
   // --- UI Render ---
 
   // Profile List
-  const profiles = appData?.profiles ? Object.values(appData.profiles) : [];
+  const profiles: Profile[] = appData?.profiles ? Object.values(appData.profiles) : [];
   const currentProfileId = appData?.settings?.currentProfile;
   const currentProfile = currentProfileId ? appData?.profiles?.[currentProfileId] : null;
 
