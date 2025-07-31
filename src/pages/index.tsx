@@ -538,7 +538,7 @@ export default function FocusFlow() {
   const [createForm, setCreateForm] = useState<{ name: string; avatar: string; type: ProfileType }>({
     name: "",
     avatar: "😀",
-    type: "student",
+    type: "student" as ProfileType,
   });
   const [saving, setSaving] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
@@ -641,7 +641,7 @@ export default function FocusFlow() {
       return updated;
     });
     setShowCreateModal(false);
-    setCreateForm({ name: "", avatar: "😀", type: "student" });
+    setCreateForm({ name: "", avatar: "😀", type: "student" as ProfileType });
     toast({ title: "Profile created!", description: `Welcome, ${newProfile.name}!` });
   }
 
@@ -1441,7 +1441,7 @@ export default function FocusFlow() {
                           ? "border-primary bg-primary/10"
                           : "border-slate-200 bg-white hover:bg-slate-50"
                       )}
-                      onClick={() => setCreateForm(f => ({ ...f, type: type.key }))}
+                      onClick={() => setCreateForm(f => ({ ...f, type: type.key as ProfileType }))}
                       aria-label={`Select ${type.label} profile`}
                     >
                       <span className="text-xl mr-2">{type.emoji}</span>
