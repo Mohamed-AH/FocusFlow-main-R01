@@ -1,5 +1,42 @@
 import React, { useEffect, useState, useRef } from "react";
 import Head from "next/head";
+
+// --- Types & Interfaces ---
+type ProfileType = "student" | "professional" | "entrepreneur" | "creative" | "mom" | "custom";
+
+interface Activity {
+  id: string;
+  name: string;
+  duration: number;
+  color: string;
+  icon: string;
+  category: string;
+}
+
+interface ActivityRecord {
+  completed: boolean;
+  planned: boolean;
+  actualDuration: number;
+  completedAt: string | null;
+  focusRating: number | null;
+  notes: string;
+}
+
+interface DailyRecord {
+  date: string;
+  activities: Record<string, ActivityRecord>;
+  completionRate?: number;
+  mood?: string;
+}
+
+interface Profile {
+  id: string;
+  name: string;
+  type: ProfileType;
+  activities: Activity[];
+  dailyRecords: Record<string, DailyRecord>;
+}
+
 import { AnimatePresence, motion } from "framer-motion";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -919,7 +956,7 @@ export default function FocusFlow() {
                         )}
                         style={{
                           background: currentProfileId === profile.id
-                            ? `linear-gradient(90deg, ${COLOR_PALETTE[profile.type] || COLOR_PALETTE.primary}11 0%, #fff 100%)`
+                            ? `linear-gradient(90deg, ${COLOR_PALETTE[profile.type as keyof typeof COLOR_PALETTE] || COLOR_PALETTE.primary}11 0%, #fff 100%)`
                             : "#fff",
                         }}
                         onClick={() => handleProfileSwitch(profile.id)}
@@ -1016,7 +1053,7 @@ export default function FocusFlow() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {profiles.map((profile: any) => (
+                  {profiles.map((profile: Profile) => (
                     <button
                       key={profile.id}
                       className={cn(
@@ -1107,7 +1144,7 @@ export default function FocusFlow() {
                 dailyRecords={
                   // Map dailyRecords to MonthlyHeatmap's expected shape for current month
                   Object.values(currentProfile.dailyRecords || {})
-                    .filter((rec: any) => {
+                    .filter((rec: DailyRecord) => {
                       if (!rec?.date) return false;
                       const date = new Date(rec.date);
                       const now = new Date();
@@ -1117,7 +1154,7 @@ export default function FocusFlow() {
                         date.getUTCMonth() === now.getUTCMonth()
                       );
                     })
-                    .map((rec: any) => ({
+                    .map((rec: DailyRecord) => ({
                       date: rec.date,
                       completion: rec.completionRate ?? 0,
                       mood: rec.mood,
@@ -1152,7 +1189,7 @@ export default function FocusFlow() {
                   {(provided) => (
                     <div ref={provided.innerRef} {...provided.droppableProps}>
                       <AnimatePresence>
-                        {getActivitiesForToday(currentProfile).map((activity: any, idx: number) => {
+                        {getActivitiesForToday(currentProfile).map((activity: Activity, idx: number) => {
                           // Determine state from dailyRecords
                           const today = getTodayDate();
                           const daily = currentProfile.dailyRecords?.[today];
