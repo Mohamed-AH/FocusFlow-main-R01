@@ -535,7 +535,7 @@ export default function FocusFlow() {
   const [appData, setAppData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [createForm, setCreateForm] = useState({
+  const [createForm, setCreateForm] = useState<{ name: string; avatar: string; type: ProfileType }>({
     name: "",
     avatar: "😀",
     type: "student",
