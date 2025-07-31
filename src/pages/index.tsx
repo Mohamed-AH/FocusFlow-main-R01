@@ -1134,7 +1134,7 @@ export default function FocusFlow() {
                   {
                     // Streak ring (thin, secondary color)
                     value: 1,
-                    color: COLOR_PALETTE[currentProfile.type] || COLOR_PALETTE.primary,
+                    color: COLOR_PALETTE[currentProfile.type as keyof typeof COLOR_PALETTE] || COLOR_PALETTE.primary,
                     strokeWidth: 4,
                     dashed: true,
                     zIndex: 1,
