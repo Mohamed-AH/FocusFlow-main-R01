@@ -616,7 +616,7 @@ export default function FocusFlow() {
         toast({ 
           title: "Almost there! 📊", 
           description: `You're at ${daily.completionRate}%. Just a bit more to reach ${completionGoal}% and maintain your streak!`, 
-          variant: "warning" 
+          variant: "destructive" 
         });
       }
       // Streak logic (simple for demo)
@@ -639,7 +639,7 @@ export default function FocusFlow() {
           toast({ 
             title: "Streak at risk! ⚠️", 
             description: "Keep your daily completion above 70% to maintain your streak!", 
-            variant: "warning" 
+            variant: "destructive" 
           });
         }
       }
